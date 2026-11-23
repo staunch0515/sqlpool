@@ -1,0 +1,3491 @@
+/* Style follows docs/ui-style.md (the Vioros app): same tokens, shell and table rules. */
+
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --sidebar: #ececf0;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --border: #d2d2d7;
+  --accent: #0a84ff;
+  --danger: #ff3b30;
+  --warn: #ff9f0a;
+  --ok: #34c759;
+  --row-hover: rgba(127, 127, 127, 0.08);
+  /* the macOS system face (SF, with PingFang for Chinese): the same letters Finder and Mail draw */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --bg: #1c1c1e;
+  --surface: #2c2c2e;
+  --sidebar: #242426;
+  --text: #f5f5f7;
+  --muted: #98989d;
+  --border: #3a3a3c;
+  --row-hover: rgba(255, 255, 255, 0.06);
+}
+}
+
+:root[data-theme="dark"] {
+  --bg: #1c1c1e;
+  --surface: #2c2c2e;
+  --sidebar: #242426;
+  --text: #f5f5f7;
+  --muted: #98989d;
+  --border: #3a3a3c;
+  --row-hover: rgba(255, 255, 255, 0.06);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+code,
+.mono {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+}
+
+/* ---------- controls ---------- */
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+}
+
+button {
+  cursor: pointer;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 500;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.ghost,
+button.small {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+button.small {
+  padding: 3px 9px;
+  font-size: 13px;
+}
+
+button.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Text-style button, e.g. "Reindex" */
+
+button.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 16px;
+  padding: 2px 8px;
+}
+
+button.icon-btn.active {
+  color: var(--accent);
+}
+
+/* ---------- shell (Vioros layout) ---------- */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.top-bar {
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 80px;
+}
+
+.nav {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.status-bar {
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--sidebar);
+  border-top: 1px solid var(--border);
+}
+
+.status-bar .spacer {
+  flex: 1;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.status-dot.on {
+  background: var(--ok);
+}
+
+/* ---------- list and detail (Vioros table) ---------- */
+
+/* Right edge of a header: drag to resize the column (Vioros: 8px wide, accent on hover). */
+.col-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 2;
+}
+
+/* ---------- sections, forms and text ---------- */
+
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.section > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.section > summary::after {
+  content: "▸";
+  margin-left: auto;
+  color: var(--muted);
+}
+
+.section[open] > summary::after {
+  content: "▾";
+}
+
+.section-body {
+  padding: 0 14px 14px;
+}
+
+.count-badge {
+  background: var(--sidebar);
+  color: var(--muted);
+  border-radius: 9px;
+  padding: 0 7px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.code {
+  margin: 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--sidebar);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  white-space: pre;
+  overflow: auto;
+}
+
+.meta,
+.hint {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 28px 12px;
+}
+
+.banner {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 0 0 10px;
+  white-space: pre-wrap;
+}
+
+.banner.error {
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--danger);
+}
+
+.banner.warn {
+  background: rgba(255, 159, 10, 0.14);
+  color: var(--warn);
+}
+
+.banner.ok {
+  background: rgba(52, 199, 89, 0.14);
+  color: var(--ok);
+}
+
+.error-inline {
+  color: var(--danger);
+}
+
+.runs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.runs li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+/* ---------- favorites ---------- */
+
+.star {
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.star.on {
+  color: var(--warn);
+}
+
+.star.big {
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+.star.big.on {
+  color: var(--warn);
+}
+
+/* ---------- results ---------- */
+
+.table-wrap {
+  overflow: auto;
+  max-height: 50vh;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table-wrap th,
+.table-wrap td {
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-wrap th {
+  position: sticky;
+  top: 0;
+  background: var(--sidebar);
+}
+
+.null {
+  color: var(--muted);
+}
+
+/* ---------- settings page ---------- */
+
+.settings-page {
+  overflow: auto;
+  padding: 16px;
+  max-width: 720px;
+}
+
+/* ---------- splitters (Vioros: 8px hit area, accent on hover) ---------- */
+
+.splitter-v,
+.splitter-h {
+  flex-shrink: 0;
+  background: var(--border);
+  opacity: 0.6;
+  touch-action: none;
+}
+
+.splitter-v {
+  width: 8px;
+  cursor: col-resize;
+}
+
+.splitter-h {
+  height: 8px;
+  cursor: row-resize;
+}
+
+.splitter-v:hover,
+.splitter-h:hover {
+  background: var(--accent);
+  opacity: 1;
+}
+
+body.resizing,
+body.resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+body.resizing-y,
+body.resizing-y * {
+  cursor: row-resize !important;
+  user-select: none !important;
+}
+
+/* ---------- sub-tabs under the path bar (Vioros: List / Download / Upload) ---------- */
+
+.sub-tabs {
+  flex-shrink: 0;
+  display: flex;
+  gap: 22px;
+  padding: 0 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---------- action bar between the table and the detail (Vioros: "Public link" bar) ---------- */
+
+/* ---------- info panel: fixed label column, values wrap on the left (Vioros info table) ---------- */
+
+/* ---------- left column: groups of the current list ---------- */
+
+/* sub-tabs inside the table toolbar: no card border, sit on the bar */
+
+/* ================= VS Code layout, Vioros colours ================= */
+
+.workbench {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* activity bar: icons for the side views, Settings at the bottom */
+.activity-bar {
+  width: 48px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+}
+
+button.act {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 18px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+button.act:hover {
+  color: var(--text);
+  background: var(--row-hover);
+}
+
+button.act.active {
+  color: var(--accent);
+  background: var(--surface);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* side panel: header, toolbar, group trees */
+.side-panel {
+  flex-shrink: 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--sidebar);
+  overflow: hidden;
+}
+
+.side-head {
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.side-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.side-empty {
+  padding: 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.tree {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+button.tree-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 26px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 400;
+  text-align: left;
+}
+
+button.tree-item:hover {
+  background: var(--row-hover);
+}
+
+button.tree-item.active {
+  background: rgba(10, 132, 255, 0.18);
+}
+
+button.tree-item.run-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.tree-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* editor column: tab strip, editor, bottom panel */
+.editor-col {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-strip {
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  overflow-x: auto;
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  padding: 0 8px 0 14px;
+  border-right: 1px solid var(--border);
+  border-top: 2px solid transparent;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab-item.active {
+  background: var(--surface);
+  color: var(--text);
+  border-top-color: var(--accent);
+}
+
+.tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+button.tab-close {
+  padding: 0 4px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+}
+
+button.tab-close:hover {
+  background: var(--row-hover);
+  color: var(--text);
+}
+
+.editor-area {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 20px;
+  background: var(--surface);
+}
+
+.bottom-wrap {
+  flex-shrink: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.bottom {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-tabs {
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--border);
+}
+
+button.panel-tab {
+  padding: 4px 10px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+button.panel-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 12px;
+}
+
+.panel-body .table-wrap {
+  max-height: none;
+  border: none;
+  border-radius: 0;
+}
+
+.status-notice {
+  margin-left: 12px;
+  color: var(--warn);
+}
+
+.settings-page {
+  padding: 16px 20px;
+  max-width: 720px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ================= editor pane (VS Code editor frame) ================= */
+
+.editor-area {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.pane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.breadcrumb {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.crumb-sep {
+  margin: 0 4px;
+  opacity: 0.7;
+}
+
+.pane-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.pane-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* toolbar buttons: icon + label, flat, like VS Code's editor actions */
+button.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+button.tool-btn:hover:not(:disabled) {
+  background: var(--row-hover);
+  border-color: var(--border);
+}
+
+button.tool-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 500;
+}
+
+button.tool-btn.primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+button.tool-btn.danger {
+  color: var(--danger);
+}
+
+.tool-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 6px;
+  background: var(--border);
+}
+
+.sql-wrap {
+  flex: 1;
+  min-height: 160px;
+  position: relative;
+  background: var(--surface);
+}
+
+/* the editor fills its box exactly: Monaco needs a size it can measure */
+.sql-editor {
+  position: absolute;
+  inset: 0;
+}
+
+.status-error {
+  color: var(--danger);
+}
+
+/* folder tree actions */
+
+button.icon-mini {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1;
+}
+
+button.icon-mini:hover {
+  background: var(--row-hover);
+  color: var(--text);
+}
+
+button.icon-mini.danger-text {
+  width: auto;
+  padding: 0 6px;
+  font-size: 11px;
+  color: var(--danger);
+}
+
+.side-add {
+  display: flex;
+  gap: 6px;
+  padding: 0 10px 8px;
+}
+
+.side-add input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  padding: 4px 8px;
+}
+
+/* ================= date-time picker (react-datepicker, Vioros colours) ================= */
+
+.time-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 260px;
+}
+
+.time-wrap {
+  width: 100%;
+}
+
+input.time-text {
+  width: 100%;
+  font-size: 13px;
+  padding: 4px 8px;
+}
+
+.time-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* calendar popup */
+.react-datepicker {
+  font-family: inherit;
+  font-size: 13px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  /* the time list sits beside the calendar, outside its box: it must not be clipped */
+  overflow: visible;
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid var(--border);
+  border-radius: 0 10px 10px 0;
+  overflow: hidden;
+}
+
+.react-datepicker__header {
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  color: var(--text);
+}
+
+.react-datepicker__day:hover,
+.react-datepicker__month-text:hover,
+.react-datepicker__time-list-item:hover {
+  background: var(--row-hover);
+}
+
+.react-datepicker__day--keyboard-selected {
+  background: rgba(10, 132, 255, 0.18);
+}
+
+.react-datepicker__day--today {
+  font-weight: 700;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-range,
+.react-datepicker__time-list-item--selected {
+  background: var(--accent) !important;
+  color: #fff !important;
+}
+
+.react-datepicker__day--outside-month {
+  color: var(--muted);
+}
+
+.react-datepicker__triangle {
+  display: none;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: var(--muted);
+}
+
+.react-datepicker__time-container,
+.react-datepicker__time {
+  background: var(--surface);
+}
+
+.react-datepicker__time-list-item {
+  color: var(--text);
+}
+
+.react-datepicker__close-icon::after {
+  background: var(--muted);
+}
+
+.react-datepicker__today-button {
+  background: var(--sidebar);
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 0;
+}
+
+/* ================= side panel: search and icon toolbar (Termix style) ================= */
+
+.side-search {
+  flex-shrink: 0;
+  padding: 8px 10px 4px;
+}
+
+.side-search input {
+  width: 100%;
+  padding: 5px 8px;
+  font-size: 13px;
+  background: var(--surface);
+}
+
+.side-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.side-toolbar .side-count {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+button.icon-sq {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+}
+
+button.icon-sq:hover:not(:disabled) {
+  background: var(--row-hover);
+  color: var(--text);
+}
+
+button.icon-sq.active {
+  color: var(--accent);
+  background: var(--surface);
+}
+
+/* ================= work in progress: spinners ================= */
+
+@keyframes spin {
+  to {
+  transform: rotate(360deg);
+}
+}
+
+.spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: spin 0.8s linear infinite;
+}
+
+button.icon-sq .spinner {
+  width: 13px;
+  height: 13px;
+}
+
+button.tool-btn .spinner {
+  width: 11px;
+  height: 11px;
+}
+
+button.tool-btn.primary .spinner {
+  border-color: rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+}
+
+/* a line of "working…" text, used in the status bar and in lists */
+.working {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.working .spinner {
+  width: 10px;
+  height: 10px;
+}
+
+/* a list that is still loading: centred, with room around it */
+.tree > .working,
+.side-panel > .working {
+  padding: 14px;
+}
+
+.bottom .working,
+.editor-area > .working {
+  padding: 12px;
+}
+
+/* ================= progress: visible on purpose ================= */
+
+/* a thin line under the top bar that moves while anything is working */
+.top-bar {
+  position: relative;
+}
+
+@keyframes slide {
+  from {
+  left: -35%;
+}
+  to {
+  left: 100%;
+}
+}
+
+/* a big, obvious spinner for the results area */
+.spinner.big {
+  width: 28px;
+  height: 28px;
+  border-width: 3px;
+}
+
+.running-big {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 14px;
+  border-radius: 10px;
+  background: var(--sidebar);
+  margin: 8px 0;
+}
+
+.running-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* the spinner next to a busy button stays visible on the primary colour */
+button.tool-btn.primary .spinner {
+  width: 13px;
+  height: 13px;
+}
+
+/* ================= the editor pane itself moves while busy ================= */
+
+.busy-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(1px);
+  animation: fade-in 0.15s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+  opacity: 0;
+}
+  to {
+  opacity: 1;
+}
+}
+
+.busy-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 30px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.busy-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.busy-time {
+  color: var(--muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.spinner.huge {
+  width: 40px;
+  height: 40px;
+  border-width: 4px;
+}
+
+/* one covering layer at a time: the editor's own "Opening…" layer wins over the general one */
+.busy-overlay ~ .busy-overlay {
+  display: none;
+}
+
+/* side views stay mounted; only the active one shows */
+.side-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* each open editor fills the area when it is the active tab */
+.editor-slot {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ================= SQL content page: SQL beside the info panel (Vioros content + info panel) ================= */
+
+.sql-split {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.sql-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sql-info {
+  flex-shrink: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 14px;
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sql-info .info-title {
+  font-size: 14px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+/* the params and warnings sit above the SQL, on the left */
+
+/* ================= result table: many columns, sortable, resizable (Vioros table) ================= */
+
+.result-table {
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.result-table th {
+  top: 0;
+  z-index: 1;
+  position: sticky;
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 6px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.result-table th.sortable {
+  cursor: pointer;
+}
+
+.result-table th.sortable:hover {
+  color: var(--text);
+}
+
+.result-table th .th-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-table tbody tr:hover {
+  background: var(--row-hover);
+}
+
+.result-table .col-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 2;
+}
+
+.result-table .col-resizer:hover {
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* the results area scrolls both ways; a tall result keeps its header on top */
+.panel-body .table-wrap {
+  overflow: auto;
+  max-height: none;
+  height: 100%;
+}
+
+/* ================= every table fills its area ================= */
+
+/* results: fill the width when the columns are few; scroll sideways when they are many */
+.result-table {
+  width: 100%;
+}
+
+/* ================= info table: Vioros info-table, same numbers ================= */
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.info-table th,
+.info-table td {
+  padding: 6px 0;
+  border-bottom: 0.5px solid var(--border);
+  vertical-align: middle;
+  text-align: left;
+}
+
+/* the label column is as wide as its text, grey, not bold */
+.info-table th {
+  width: 1%;
+  white-space: nowrap;
+  color: var(--muted);
+  font-weight: 400;
+  padding-right: 10px;
+}
+
+.info-table td {
+  width: 100%;
+  word-break: break-word;
+}
+
+/* edit fields: boxes that fill the value cell */
+.info-table td input,
+.info-table td select {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.info-table td textarea {
+  width: 100%;
+  box-sizing: border-box;
+  height: 44px;
+  min-height: 44px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* read-only values: plain text, no box */
+.info-table td input[readonly],
+.info-table td textarea[readonly] {
+  border-color: transparent;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  color: var(--text);
+}
+
+.info-table td input[readonly]:focus,
+.info-table td textarea[readonly]:focus {
+  border-color: transparent;
+}
+
+/* the info panel: the Vioros padding and title */
+.sql-info {
+  padding: 14px 16px;
+}
+
+.sql-info .info-title {
+  font-size: 14px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+/* parameters above the SQL: the same table, filling the width */
+.params-block {
+  flex-shrink: 0;
+  padding: 0 14px;
+}
+
+.params-block .info-table {
+  margin-top: 8px;
+}
+
+/* the time box and its quick-pick dropdown sit side by side, filling the cell */
+.time-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.time-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.time-wrap .react-datepicker-wrapper {
+  display: block;
+}
+
+select.time-pick {
+  flex-shrink: 0;
+  width: 112px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+/* two columns: the date box takes the rest, the quick-pick keeps its width */
+.time-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+}
+
+.time-input .react-datepicker-wrapper,
+.time-input .react-datepicker__input-container {
+  width: 100%;
+  min-width: 0;
+}
+
+.time-input input.time-text {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* the info panel is a column: the notes block takes the rest of its height */
+.sql-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-notes {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 6px 0;
+  border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+}
+
+.info-notes .info-key {
+  white-space: nowrap;
+  color: var(--muted);
+  padding-right: 10px;
+  padding-top: 7px;
+  flex-shrink: 0;
+  width: auto;
+}
+
+.info-notes textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 60px;
+  height: auto;
+  box-sizing: border-box;
+  resize: none;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-left: 10px;
+}
+
+/* the label keeps its width: it must not be squeezed by the notes box */
+
+/* the date box and the quick-pick are one control: same height, no gap, one border between them */
+.time-input {
+  gap: 0;
+}
+
+.time-input input.time-text {
+  height: 30px;
+  padding: 0 9px;
+  font-size: 14px;
+  border-radius: 6px 0 0 6px;
+  border-right: none;
+}
+
+select.time-pick {
+  height: 30px;
+  width: 100%;
+  padding: 0 8px;
+  font-size: 14px;
+  border-radius: 0 6px 6px 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.time-input .react-datepicker__input-container input {
+  height: 30px;
+}
+
+/* ================= SQL toolbar: small, equal icon buttons on the right ================= */
+
+.pane-toolbar {
+  justify-content: flex-end;
+  padding: 3px 8px;
+  min-height: 34px;
+}
+
+.pane-actions {
+  gap: 2px;
+}
+
+button.tool-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+button.tool-btn:hover:not(:disabled) {
+  background: var(--row-hover);
+  color: var(--text);
+  border-color: transparent;
+}
+
+button.tool-btn.primary {
+  background: none;
+  border-color: transparent;
+  color: var(--accent);
+}
+
+button.tool-btn.primary:hover:not(:disabled) {
+  background: rgba(10, 132, 255, 0.12);
+  color: var(--accent);
+}
+
+button.tool-btn.danger {
+  color: var(--danger);
+}
+
+button.tool-btn:disabled {
+  opacity: 0.35;
+}
+
+button.tool-btn .spinner {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+.tool-sep {
+  width: 1px;
+  height: 16px;
+  margin: 0 5px;
+  background: var(--border);
+}
+
+/* the icons sit on the left edge of the toolbar */
+.pane-toolbar {
+  justify-content: flex-start;
+}
+
+/* ================= breadcrumb: VS Code style, quiet grey segments, the current one in full colour ================= */
+
+.breadcrumb {
+  padding: 5px 12px 2px;
+  gap: 0;
+  background: none;
+  border-bottom: none;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.crumb-part {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 2px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.crumb-part:hover {
+  color: var(--text);
+}
+
+.crumb-sep {
+  margin: 0 3px;
+  color: var(--muted);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.crumb-part.current {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ================= standard data table: boxes fill the row, no space between the lines and the boxes ================= */
+
+.info-table th,
+.info-table td {
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 36px;
+}
+
+.info-table th {
+  padding-left: 10px;
+}
+
+.info-table td {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.info-table td input:not([type="checkbox"]),
+.info-table td select {
+  height: 34px;
+  margin: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.info-table td input[readonly] {
+  padding-left: 10px;
+}
+
+.info-table td input:not([readonly]) {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* the time box and the quick-pick keep the same 34px as the other fields */
+.time-input input.time-text,
+select.time-pick {
+  height: 34px;
+}
+
+.info-table td .time-input {
+  height: 34px;
+}
+
+/* ================= editable fields look sunk into the table ================= */
+
+.info-table td input:not([readonly]),
+.info-table td select,
+.info-table td textarea:not([readonly]) {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  border-radius: 5px;
+}
+
+.info-table td input:not([readonly]):focus,
+.info-table td select:focus,
+.info-table td textarea:not([readonly]):focus {
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 2px rgba(10, 132, 255, 0.18);
+}
+
+/* the quick-pick and the date box share the same sunk look */
+.time-input input.time-text,
+select.time-pick {
+  background: var(--bg);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* ================= the box's top and bottom edges ARE the table's row lines ================= */
+
+.info-table th,
+.info-table td {
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* the field fills the row exactly: its top edge sits on the line above, its bottom edge on the line below */
+.info-table td input,
+.info-table td select,
+.info-table td textarea {
+  height: 35px;
+  margin: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+.info-table td textarea {
+  height: auto;
+  min-height: 35px;
+}
+
+.info-table td input:not([readonly]),
+.info-table td select {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.time-input input.time-text,
+select.time-pick {
+  height: 35px;
+  border-radius: 0;
+}
+
+/* same specificity as the earlier rule, so this one wins: the field is exactly the row's height */
+.info-table td input:not([type="checkbox"]) {
+  height: 35px;
+}
+
+/* ================= editable fields: white, no grey, no shadow; top and bottom are the row lines ================= */
+
+.info-table td input:not([readonly]),
+.info-table td select,
+.info-table td textarea:not([readonly]),
+.time-input input.time-text,
+select.time-pick {
+  background: var(--surface);
+  box-shadow: none;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.info-table td input:not([readonly]):focus,
+.info-table td select:focus,
+.info-table td textarea:not([readonly]):focus,
+.time-input input.time-text:focus,
+select.time-pick:focus {
+  background: var(--surface);
+  box-shadow: none;
+}
+
+/* square corners: no rounding on the table fields */
+.info-table td input,
+.info-table td select,
+.info-table td textarea,
+.time-input input.time-text,
+select.time-pick {
+  border-radius: 0 !important;
+}
+
+/* ================= square corners, and every font one size up ================= */
+
+/* base text */
+:root {
+  font-size: 15px;
+}
+
+.info-table,
+.info-table th,
+.info-table td,
+.info-table input,
+.info-table select,
+.info-table textarea,
+.info-key,
+.info-title,
+.time-input input.time-text,
+select.time-pick {
+  font-size: 14px;
+}
+
+.info-table th,
+.info-key {
+  font-size: 14px;
+}
+
+.info-title {
+  font-size: 15px;
+}
+
+.breadcrumb,
+.crumb-part,
+.status-bar,
+.side-count,
+.meta,
+.hint,
+.count-badge,
+.tree-item,
+.tab-item,
+.panel-tab,
+.result-table,
+.result-table th,
+.result-table td,
+.side-empty,
+.working {
+  font-size: 13px;
+}
+
+.breadcrumb,
+.crumb-part {
+  font-size: 13px;
+}
+
+.tree-item,
+.tab-item,
+.panel-tab {
+  font-size: 14px;
+}
+
+.result-table,
+.result-table th,
+.result-table td {
+  font-size: 14px;
+}
+
+.status-bar {
+  font-size: 13px;
+}
+
+/* ================= the info panel keeps the width the user set: content cannot change it ================= */
+
+.sql-info {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.sql-info .info-table,
+.sql-info .info-notes {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sql-info .info-table {
+  table-layout: auto;
+}
+
+.sql-info .info-notes textarea {
+  width: 100%;
+}
+
+/* ================= every font one size up again ================= */
+
+:root {
+  font-size: 16px;
+  --c-catalog: #0a84ff;
+  --c-saved: #1f9d6b;
+  --c-env: #8a4fd6;
+  --c-history: #d97706;
+  --c-folder: #e0a000;
+  --c-run: #1f9d4a;
+  --c-save: #0a84ff;
+  --c-copy: #5b6470;
+  --c-star: #f5a524;
+  --c-delete: #e5484d;
+  --c-ds: #0f9d8f;
+}
+
+.info-table,
+.info-table th,
+.info-table td,
+.info-table input,
+.info-table select,
+.info-table textarea,
+.info-key,
+.time-input input.time-text,
+select.time-pick {
+  font-size: 15px !important;
+}
+
+.info-title {
+  font-size: 16px;
+}
+
+.breadcrumb,
+.crumb-part,
+.status-bar,
+.side-count,
+.meta,
+.hint,
+.count-badge,
+.side-empty,
+.working,
+.empty {
+  font-size: 14px;
+}
+
+.tree-item,
+.tab-item,
+.panel-tab,
+.result-table,
+.result-table th,
+.result-table td,
+.banner,
+.tool-btn {
+  font-size: 15px;
+}
+
+/* automatic table layout, as in Vioros: the label column is as wide as its text, so nothing overlaps */
+
+.info-table th {
+  width: auto;
+  white-space: nowrap;
+  border-right: 0.5px solid var(--border);
+}
+
+.info-table td {
+  width: 100%;
+  padding-left: 10px;
+}
+
+/* vertical rule between the label column and the value column, like a data table */
+
+/* the same rule for the notes block: label | text */
+.info-notes .info-key {
+  border-right: 0.5px solid var(--border);
+  padding-left: 0;
+  margin-right: 10px;
+}
+
+/* one label column width for the table and the notes block, so their vertical rules line up */
+.sql-info .info-table {
+  table-layout: fixed;
+  width: 100%;
+  margin-bottom: -8px;
+}
+
+.info-table th {
+  width: 84px;
+  min-width: 84px;
+  max-width: 84px;
+  box-sizing: border-box;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.info-table td {
+  width: auto;
+}
+
+.info-notes .info-key {
+  width: 84px;
+  min-width: 84px;
+  max-width: 84px;
+  box-sizing: border-box;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-right: 0;
+}
+
+/* no vertical rules; the notes box is square like the other fields */
+.info-table th,
+.info-notes .info-key {
+  border-right: none;
+}
+
+.info-notes textarea,
+.info-notes textarea:focus {
+  border-radius: 0 !important;
+}
+
+/* Notes sits flush under the table, with the same gaps as the table rows (no extra gap or padding) */
+
+.info-notes {
+  padding: 0;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.info-notes .info-key {
+  padding: 8px 10px 0 10px;
+  margin: 0;
+  width: 94px;
+  min-width: 94px;
+  max-width: 94px;
+}
+
+.info-notes textarea {
+  margin-left: 0;
+  padding: 8px 10px;
+}
+
+/* the Notes label column is as wide as the table's label column (the rule lines up with the table's) */
+
+/* tab strip: 30% shorter than 65px (45.5px) */
+.tab-strip {
+  height: 45.5px;
+  scrollbar-width: none;
+}
+
+/* all-tabs button and menu, at the right end of the strip */
+.tab-strip-wrap {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.tab-strip-wrap .tab-strip {
+  flex: 1;
+  min-width: 0;
+  height: 45.5px;
+}
+
+.tab-all {
+  flex-shrink: 0;
+  width: 40px;
+  height: 45.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sidebar);
+  border: none;
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab-all:hover {
+  color: var(--text);
+  background: var(--row-hover);
+}
+
+.tab-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.tab-menu {
+  position: absolute;
+  top: 45.5px;
+  right: 0;
+  z-index: 41;
+  width: 440px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  font-size: 14px;
+}
+
+.tab-menu-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-menu-empty {
+  padding: 12px;
+  color: var(--muted);
+}
+
+.tab-menu-close-all {
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border);
+  color: var(--danger);
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tab-menu-close-all:hover {
+  background: var(--row-hover);
+}
+
+/* no scrollbar on the tab strip; it still scrolls with the trackpad or wheel */
+
+.tab-strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================= environments ================= */
+.env-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.env-picker select {
+  min-width: 160px;
+  height: 28px;
+  padding: 0 6px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  font-size: 13px;
+}
+
+.env-page {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* ================= environment parent picker and rows ================= */
+
+.parent-branch {
+  color: var(--muted);
+  margin-right: 6px;
+}
+
+/* the parameter name reads as the row label, like the SQL parameter labels: no box */
+.info-table th input.env-key {
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 400;
+  text-align: left;
+}
+
+/* environment page: a wider label column, shared by the table and the description label */
+.env-page .info-table th,
+.env-page .info-notes .info-key {
+  width: 160px;
+  min-width: 160px;
+  max-width: 160px;
+}
+
+/* environment page: every table here starts at the same left edge and uses the same label column */
+.env-page .params-block {
+  padding: 0;
+}
+
+.env-page .info-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* environment page: the "all parameters" view */
+
+.env-key-text {
+  color: var(--muted);
+}
+
+/* parameter name with its tree hint */
+.env-key-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.env-key-label .env-key {
+  flex: 1;
+  min-width: 0;
+}
+
+.env-hint {
+  position: relative;
+  display: inline-flex;
+  color: var(--muted);
+  cursor: help;
+  flex-shrink: 0;
+}
+
+.env-hint-pop {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 20px;
+  z-index: 50;
+  min-width: 220px;
+  max-width: 420px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.env-hint:hover .env-hint-pop,
+.env-hint:focus .env-hint-pop,
+.env-hint:focus-within .env-hint-pop {
+  display: block;
+}
+
+.env-hint-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.env-hint-value {
+  margin-left: auto;
+  padding-left: 12px;
+  font-family: ui-monospace, Menlo, monospace;
+}
+
+/* the parameter's values across the tree, as a table */
+.env-hint-table {
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+
+.env-hint-table th,
+.env-hint-table td {
+  padding: 4px 10px;
+  text-align: left;
+  border-bottom: 0.5px solid var(--border);
+  white-space: nowrap;
+}
+
+.env-hint-table th {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.env-hint-table td.env-hint-value {
+  text-align: right;
+  font-family: ui-monospace, Menlo, monospace;
+}
+
+.env-hint-table tr.this td {
+  font-weight: 600;
+}
+
+.env-hint-this {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.env-hint-empty {
+  color: var(--muted);
+}
+
+.env-hint-pop .env-hint-value {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+/* environment page: one table, so the label and value rules line up for every row */
+.env-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.env-table col.env-col-label {
+  width: 160px;
+}
+
+.env-table tr.env-section th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  padding-top: 14px;
+}
+
+.env-table textarea.env-description {
+  width: 100%;
+  min-height: 72px;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+}
+
+/* the hint after an inherited parameter's name; its popup opens below the name */
+.env-table th .env-hint-pop {
+  top: 100%;
+  left: 0;
+  right: auto;
+  z-index: 60;
+}
+
+/* ================= side trees: one style ================= */
+
+/* a row: the background is the only thing hover changes; the actions keep their place */
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding-right: 6px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tree-row:hover {
+  background: var(--row-hover);
+}
+
+.tree-row.active {
+  background: rgba(10, 132, 255, 0.18);
+}
+
+.tree-row.is-group {
+  font-weight: 600;
+}
+
+.tree-row.drop-over {
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: rgba(10, 132, 255, 0.12);
+}
+
+.tree-chev {
+  width: 12px;
+  display: inline-flex;
+  justify-content: center;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.tree-icon {
+  width: 14px;
+  display: inline-flex;
+  justify-content: center;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.tree-row.is-group .tree-icon {
+  color: var(--accent);
+}
+
+.tree-row .tree-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.tree-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  visibility: hidden;
+}
+
+.tree-row:hover .tree-row-actions,
+.tree-row.active .tree-row-actions {
+  visibility: visible;
+}
+
+.tree-star {
+  color: var(--warn);
+  flex-shrink: 0;
+}
+
+.env-in-use {
+  font-size: 11px;
+  color: var(--accent);
+  margin-right: 4px;
+}
+
+.tree-drop-top {
+  margin: 6px 10px;
+  padding: 8px;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.tree-drop-top.drop-over {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* new folder form: the field and its button form one square strip, no gap */
+.side-panel .side-add {
+  display: flex;
+  gap: 0;
+  padding: 0 10px 8px;
+}
+
+.side-panel .side-add input {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.side-panel .side-add button {
+  height: 28px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.side-panel .side-add button:disabled {
+  color: var(--muted);
+}
+
+/* the all-tabs list, as a table: kind icon, name, close */
+.tab-menu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tab-menu-table tr {
+  cursor: pointer;
+}
+
+.tab-menu-table tr:hover {
+  background: var(--row-hover);
+}
+
+.tab-menu-table tr.active {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.tab-menu-table td {
+  padding: 7px 6px;
+  border-bottom: 0.5px solid var(--border);
+  color: var(--text);
+}
+
+.tab-menu-table td.tab-menu-kind {
+  width: 28px;
+  padding-left: 12px;
+}
+
+.tab-menu-table td.tab-menu-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 0;
+  width: 100%;
+}
+
+.tab-menu-table td.tab-menu-close {
+  width: 28px;
+  padding-right: 8px;
+  text-align: right;
+}
+
+/* ================= icon colours (Tabler icons) ================= */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --c-catalog: #4da3ff;
+  --c-saved: #3fc58b;
+  --c-env: #b08cf0;
+  --c-history: #f0a04b;
+  --c-folder: #f2c044;
+  --c-run: #46c267;
+  --c-save: #4da3ff;
+  --c-copy: #9aa3ad;
+  --c-star: #f7b44a;
+  --c-delete: #ff6b6b;
+}
+}
+
+:root[data-theme="dark"] {
+  --c-catalog: #4da3ff;
+  --c-saved: #3fc58b;
+  --c-env: #b08cf0;
+  --c-history: #f0a04b;
+  --c-folder: #f2c044;
+  --c-run: #46c267;
+  --c-save: #4da3ff;
+  --c-copy: #9aa3ad;
+  --c-star: #f7b44a;
+  --c-delete: #ff6b6b;
+  --c-ds: #33c2b3;
+}
+
+/* activity bar */
+.act-catalog {
+  color: var(--c-catalog);
+}
+.act-saved {
+  color: var(--c-saved);
+}
+.act-env {
+  color: var(--c-env);
+}
+.act-history {
+  color: var(--c-history);
+}
+.act.active {
+  background: var(--row-hover);
+}
+
+/* tabs and the all-tabs list */
+.tab-icon.kind-catalog,
+.tab-menu-kind .kind-catalog {
+  color: var(--c-catalog);
+}
+.tab-icon.kind-saved,
+.tab-menu-kind .kind-saved {
+  color: var(--c-saved);
+}
+.tab-icon.kind-env,
+.tab-menu-kind .kind-env {
+  color: var(--c-env);
+}
+.tab-icon.kind-settings,
+.tab-menu-kind .kind-settings {
+  color: var(--c-copy);
+}
+
+/* side trees */
+.tree-row.tone-catalog .tree-icon {
+  color: var(--c-catalog);
+}
+.tree-row.tone-saved .tree-icon {
+  color: var(--c-saved);
+}
+.tree-row.tone-env .tree-icon {
+  color: var(--c-env);
+}
+.tree-row.is-group .tree-icon {
+  color: var(--c-folder);
+}
+
+/* toolbar buttons of the editors */
+.tool-btn.icon-play {
+  color: var(--c-run);
+}
+.tool-btn.icon-save,
+.tool-btn.icon-saveAs {
+  color: var(--c-save);
+}
+.tool-btn.icon-copy,
+.tool-btn.icon-hash,
+.tool-btn.icon-tree {
+  color: var(--c-copy);
+}
+.tool-btn.icon-star,
+.tool-btn.icon-starFilled {
+  color: var(--c-star);
+}
+.tool-btn.icon-trash,
+.tool-btn.icon-x {
+  color: var(--c-delete);
+}
+
+/* side toolbar and tree buttons */
+.ic-folder {
+  color: var(--c-folder);
+}
+.ic-saved {
+  color: var(--c-saved);
+}
+.ic-catalog {
+  color: var(--c-catalog);
+}
+.ic-copy {
+  color: var(--c-copy);
+}
+.tree-row .icon-mini {
+  color: var(--c-copy);
+}
+.tree-row .icon-mini .danger-text,
+.icon-mini.danger-text {
+  color: var(--c-delete);
+}
+.tree-row-actions .icon-mini:hover {
+  color: var(--text);
+}
+.tree-star {
+  color: var(--c-star);
+}
+.info-hint-icon {
+  color: var(--c-catalog);
+}
+.ic-env {
+  color: var(--c-env);
+}
+
+/* parameter names: a wider label column, so long names fit; a name that is still longer is cut with an ellipsis */
+.params-block .info-table th {
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the description text is the same size as the field text in the table above it */
+.info-notes textarea,
+.env-table textarea.env-description {
+  font-size: 15px !important;
+}
+
+/* the quick-pick is a button: a raised, square button with a chevron, the menu opens on click */
+select.time-pick {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 34px;
+  padding: 0 26px 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background-color: var(--surface);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 13px) 50%, calc(100% - 8px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  color: var(--text);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+select.time-pick:hover {
+  background-color: var(--row-hover);
+}
+
+select.time-pick:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* quick-pick: the button and its menu, which opens right under it */
+.time-quick {
+  position: relative;
+  min-width: 0;
+}
+
+.time-quick button.time-pick {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.time-quick button.time-pick:hover {
+  background: var(--row-hover);
+}
+
+.time-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 60;
+  min-width: 100%;
+  margin-top: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.time-menu-item {
+  padding: 6px 12px;
+  color: var(--text);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.time-menu-item:hover {
+  background: var(--row-hover);
+}
+
+.time-menu-item.active {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* side toolbar buttons look like the Add button: square, bordered, the same height */
+.side-panel button.icon-sq {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.side-panel button.icon-sq:hover:not(:disabled) {
+  background: var(--row-hover);
+}
+
+.side-panel .side-toolbar {
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.side-panel .side-toolbar .side-count {
+  margin-left: auto;
+}
+
+/* ================= environment picker in the top bar: the square button style, with the tree as its menu ================= */
+.env-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.env-picker-button {
+  min-width: 220px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.env-picker-button:hover {
+  background: var(--row-hover);
+}
+
+.env-picker-menu {
+  position: absolute;
+  top: 100%;
+  z-index: 70;
+  width: 320px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-top: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  left: 0;
+}
+
+.env-picker-item {
+  padding: 6px 12px;
+  color: var(--text);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.env-picker-item:hover {
+  background: var(--row-hover);
+}
+
+.env-picker-item.active {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.env-picker-branch {
+  color: var(--muted);
+  margin-right: 6px;
+}
+
+/* the environment in use: no box, bold text; the name is the current environment */
+.env-picker-button {
+  min-width: 0;
+  height: auto;
+  padding: 2px 6px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.env-picker-button:hover {
+  background: var(--row-hover);
+}
+
+/* side trees: larger text, rows tall enough for it */
+.tree-row {
+  height: 28px;
+  font-size: 15px;
+}
+
+.tree-row .count-badge,
+.tree-row .side-count {
+  font-size: 13px;
+}
+
+/* tree icon slots sized for the larger icons */
+.tree-chev {
+  width: 18px;
+}
+
+.tree-icon {
+  width: 22px;
+}
+
+/* tab icons: larger, and centred on the line of the tab's name */
+.tab-icon {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.tab-icon svg {
+  display: block;
+}
+
+.tab-item {
+  align-items: center;
+}
+
+.tab-item .tab-title {
+  line-height: 1.2;
+}
+
+/* the tree hint: a coloured info icon, at the right of the parameter name's cell */
+.env-table th .env-key-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.env-table .info-hint-icon {
+  color: var(--c-env);
+}
+
+/* the menu's left edge lines up with the first letter of the name in the button */
+.env-picker-anchor {
+  position: relative;
+}
+
+/* the menu's left edge is the button's left edge, where its background starts */
+
+/* the title: a display face with high contrast, large and heavy (macOS ships Bodoni 72) */
+.brand {
+  font-family: "Bodoni 72", "Bodoni 72 Smallcaps", Didot, "Didot LT STD", "Playfair Display", Georgia, serif;
+  font-size: 30px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  min-width: auto;
+  text-transform: uppercase;
+  background: linear-gradient(100deg, #0a84ff 0%, #5e5ce6 55%, #8a4fd6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
+}
+
+/* title in capitals; the top bar's items start where the editor column starts */
+
+.top-bar {
+  gap: 0;
+}
+
+.brand-slot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.top-bar .env-picker {
+  padding-left: 0;
+}
+
+/* the title: a blue-to-violet gradient fill with a soft lift */
+
+/* the environment label starts exactly where the first tab's left edge is */
+
+
+/* data sources: a checkbox row and the import row in settings */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.import-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.icon-ds { color: var(--c-ds); }
+.tree-row.tone-ds .tree-icon { color: var(--c-ds); }
+
+/* bottom panel: the actions on the right of the tabs, and the SQL that was sent */
+.bottom .panel-tabs {
+  align-items: center;
+}
+
+.panel-actions {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.panel-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sent-sql {
+  margin: 0;
+  padding: 12px 16px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.bottom .spacer {
+  flex: 1;
+}
+
+/* data source tabs and the all-tabs list: the database icon in the data source colour */
+.tab-icon.kind-ds,
+.tab-menu-kind .kind-ds { color: var(--c-ds); }
+
+/* the checkbox row in the editor: left-aligned, on one line */
+.info-table td .check {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+  text-align-last: left;
+}
+
+/* the checkbox itself keeps its own size; the table's input rules would stretch it across the cell */
+.info-table td .check input[type="checkbox"] {
+  width: auto;
+  height: auto;
+  flex: none;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* export folder: the path field and its Choose button, one row */
+.dir-row {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+}
+
+.dir-row input {
+  flex: 1;
+  min-width: 0;
+  border-right: none;
+}
+
+.dir-row button {
+  border-radius: 0;
+  padding: 0 14px;
+}
+
+/* a message from the bottom panel floats over its corner: it never pushes the results down */
+.bottom {
+  position: relative;
+}
+
+.panel-toast {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  z-index: 20;
+  max-width: 60%;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--ok);
+  color: var(--ok);
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* a kept result's tab: the facts line, the SQL that was sent, then the rows filling the rest */
+.result-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.result-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.result-facts b {
+  font-weight: 600;
+  color: var(--text);
+  margin-right: 6px;
+}
+
+.result-sql {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+}
+
+
+.result-note {
+  flex-shrink: 0;
+  padding: 6px 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.panel-toast.error {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* the kept-result tab's body is the anchor for its messages */
+.result-page {
+  position: relative;
+}
+
+.result-page .panel-toast {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  z-index: 20;
+  max-width: 60%;
+}
+
+/* every pane is the anchor of its floating messages */
+.pane {
+  position: relative;
+}
+
+/* the pick menu (data source): the same square button and menu as the quick-pick */
+.pick {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.pick-button {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pick-button:hover {
+  background: var(--row-hover);
+}
+
+.pick-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  margin-top: 2px;
+  max-height: 50vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.pick-item {
+  padding: 6px 12px;
+  color: var(--text);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pick-item:hover {
+  background: var(--row-hover);
+}
+
+.pick-item.active {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* the top bar's right side: the default data source, at a fixed place */
+.top-default {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 14px;
+  font-size: 13px;
+}
+
+.top-default-pick {
+  width: 260px;
+}
+
+/* the console: black, with white text, like a terminal */
+.console {
+  height: 100%;
+  overflow: auto;
+  padding: 10px 14px;
+  background: #111214;
+  color: #f2f2f2;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.console-cmd {
+  color: #8ab4ff;
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.console-line {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.console-line.stderr {
+  color: #ffb4a8;
+}
+
+.console-line.info {
+  color: #9aa0a6;
+  font-style: italic;
+}
+
+/* AI analysis: the question and documents at the side, the sent text or the answer beside them */
+.analysis-page {
+  height: 100%;
+  overflow: hidden;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  height: calc(100% - 40px);
+  min-height: 0;
+}
+
+.analysis-side,
+.analysis-main {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analysis-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.analysis-question {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.analysis-docs {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  padding: 6px;
+  background: var(--surface);
+}
+
+.analysis-doc {
+  padding: 4px 2px;
+  font-size: 13px;
+}
+
+.analysis-facts {
+  line-height: 1.5;
+}
+
+.analysis-text {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.analysis-sent {
+  font-size: 12px;
+}
+
+/* the request, as an editable Markdown text */
+.analysis-edit {
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  outline: none;
+}
+
+.analysis-edit:focus {
+  border-color: var(--accent);
+}
+
+/* the analysis name: one field, at the top of the side column */
+.analysis-name {
+  width: 100%;
+  height: 34px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+/* the Generate page: a tab of its own, filling the editor area */
+.gen-page {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.gen-panel {
+  position: absolute;
+  top: 56px;
+  right: 16px;
+  z-index: 45;
+  width: 860px;
+  height: calc(100% - 72px);
+  min-width: 480px;
+  min-height: 360px;
+  max-width: calc(100% - 32px);
+  /* drag the corner at the bottom right to make the panel larger or smaller */
+  resize: both;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+.gen-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.gen-body {
+  overflow-y: auto;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gen-desc {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.gen-docs {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  padding: 4px 6px;
+}
+
+.gen-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.gen-request {
+  flex: 1;
+  min-height: 260px;
+}
+
+.gen-proposal {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gen-warning {
+  color: var(--warn);
+  font-size: 13px;
+}
+
+/* the AI's own output area in the Generate panel: an error stays here */
+.gen-error {
+  padding: 8px 10px;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: var(--surface);
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+/* the toolbar's right edge: controls right-aligned (the table tab's row limit) */
+.pane-trailing {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.table-limit {
+  margin-left: 0;
+  margin-right: 0;
+  font-size: 13px;
+}
+
+.table-limit-n {
+  width: 84px;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.table-limit-n:disabled {
+  opacity: 0.5;
+}
+
+/* a versioned query's parameters, under the table's title */
+.versioned-params {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* a table that is not in the default database: muted and italic in the tree */
+.tree-row.missing .tree-label {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* the column table in a table tab: the tick column is narrow */
+.col-pick {
+  width: 36px;
+  text-align: center;
+}
+
+/* the column table in a table tab: the tick column is narrow */
+.col-pick {
+  width: 36px;
+  text-align: center;
+}

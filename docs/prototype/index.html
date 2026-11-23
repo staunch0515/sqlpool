@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>sqlpool — prototype</title>
+<style>
+/* Prototype of docs/design.md. Tokens and rules follow docs/ui-style.md. Mock data only. */
+:root {
+  --bg: #f5f5f7; --surface: #ffffff; --sidebar: #ececf0; --text: #1d1d1f; --muted: #6e6e73;
+  --border: #d2d2d7; --accent: #0a84ff; --danger: #ff3b30; --warn: #ff9f0a; --ok: #34c759;
+  --row-hover: rgba(127,127,127,.08);
+  font-family: "Helvetica Neue", Helvetica, Arial, "Segoe UI", sans-serif;
+  font-size: 14px; line-height: 1.5; color: var(--text); background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#1c1c1e; --surface:#2c2c2e; --sidebar:#242426; --text:#f5f5f7; --muted:#98989d;
+    --border:#3a3a3c; --row-hover: rgba(255,255,255,.06);
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#1c1c1e; --surface:#2c2c2e; --sidebar:#242426; --text:#f5f5f7; --muted:#98989d;
+  --border:#3a3a3c; --row-hover: rgba(255,255,255,.06);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: var(--bg); }
+input, select, button { font: inherit; border-radius: 6px; border: 1px solid var(--border); padding: 6px 10px; color: var(--text); background: var(--surface); outline: none; }
+input:focus, select:focus { border-color: var(--accent); }
+button { cursor: pointer; background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 500; }
+button:disabled { opacity: .5; cursor: default; }
+button.ghost, button.small { background: var(--surface); color: var(--text); border-color: var(--border); }
+button.small { padding: 3px 9px; font-size: 13px; }
+button.crumb { background: none; border: none; color: var(--accent); padding: 2px 4px; font-weight: 400; }
+code, .mono { font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+
+.app { display: grid; grid-template-columns: 300px minmax(0,1fr); height: 100vh; overflow: hidden; }
+.sidebar { min-width: 0; min-height: 0; overflow: hidden; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 10px; gap: 8px; }
+.col-head { height: 42px; display: flex; align-items: center; justify-content: space-between; margin: -10px -10px 0; padding: 0 16px; border-bottom: 1px solid var(--border); font-weight: 600; }
+.search { width: 100%; padding: 6px 10px; }
+.count { color: var(--muted); font-size: 13px; display: flex; gap: 8px; align-items: center; }
+.list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; min-height: 0; }
+.item { padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.item:hover { background: var(--row-hover); }
+.item.active { background: var(--accent); color: #fff; }
+.item-top { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.item-id { font-weight: 600; word-break: break-all; }
+.item-desc { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-meta { color: var(--muted); font-size: 13px; }
+.item.active .item-desc, .item.active .item-meta { color: inherit; opacity: .85; }
+.star { background: none; border: 0; padding: 0 2px; font-size: 15px; line-height: 1; color: var(--muted); }
+.star.on { color: var(--warn); }
+
+.main { min-width: 0; min-height: 0; overflow-y: auto; padding: 16px 20px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+.card-title { font-size: 14px; font-weight: 600; margin: 0; }
+.page-title { font-size: 18px; font-weight: 600; margin: 0; word-break: break-all; }
+.page-sub { margin: 2px 0 0; color: var(--muted); }
+.meta, .hint { color: var(--muted); font-size: 13px; }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+.field input, .field select { width: 100%; color: var(--text); font-size: 14px; }
+.form { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; align-items: start; }
+.form .run { grid-column: 1 / -1; justify-self: start; }
+.settings { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.settings .field input { font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+.row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.row .field { flex: 1; min-width: 220px; }
+
+.banner { padding: 8px 12px; border-radius: 8px; font-size: 13px; margin: 0 0 14px; }
+.banner.error { background: rgba(255,59,48,.12); color: var(--danger); }
+.banner.warn { background: rgba(255,159,10,.14); color: var(--warn); }
+.banner.ok { background: rgba(52,199,89,.14); color: var(--ok); }
+
+.table-wrap { overflow: auto; max-height: 340px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; font-variant-numeric: tabular-nums; }
+th { position: sticky; top: 0; background: var(--sidebar); }
+.null { color: var(--muted); }
+.history ul { list-style: none; padding: 0; margin: 6px 0 0; }
+.history li { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.empty { color: var(--muted); text-align: center; padding: 36px 12px; }
+pre { background: var(--sidebar); padding: 10px; border-radius: 8px; overflow: auto; font-size: 13px; margin: 0; }
+
+@media (max-width: 1100px) {
+  .app { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,40vh) minmax(0,1fr); }
+  .settings { grid-template-columns: minmax(0,1fr); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <input class="search" id="search" placeholder="Search queries, tags, SQL  (⌘K)" />
+    <div class="col-head"><span>📋 Queries</span><span class="count"><span id="count"></span><button class="crumb" id="reindex">Reindex</button></span></div>
+    <ul class="list" id="list"></ul>
+  </aside>
+
+  <main class="main">
+    <section class="card settings">
+      <div class="field">Catalog folder<input value="~/quizbuks/repo_quizbuks/…/queries" /></div>
+      <div class="field">Mapping JSON<input placeholder="/path/to/mapping.json" /></div>
+      <div class="field">PostgreSQL URL (read-only)<input type="password" value="••••••••" /></div>
+    </section>
+
+    <div id="detail"></div>
+  </main>
+</div>
+
+<script>
+// Mock catalog. In the app this comes from sync_catalog / search_queries / get_query.
+const QUERIES = [
+  { id: "qb.admin.fee-credit-grants", desc: "Every lot of platform fee Kudos granted (F-M2), for headquarters, read only: the sponsor, the operator when it was granted, and how it was settled", tags: "finance, weekly", fav: true, runs: 3,
+    params: [
+      { name: "publicationId", type: "text", required: false, desc: "Only this publication (empty: all)" },
+      { name: "from", type: "temporal", required: true, desc: "First bucket holds this time (UTC)" },
+      { name: "bucket", type: "enum", values: ["HOUR", "DAY"], required: true, desc: "HOUR or DAY" },
+    ],
+    warn: ["placeholder {{QbFeeCreditGrant}} is not in the mapping"],
+    cols: ["bucketStart", "views", "starts", "spent"] },
+  { id: "qb.admin.fee-credit-summary", desc: "The platform fee Kudos granted (F-M2), for headquarters, read only, summed by operator (when granted), by sponsor or by source", tags: "", fav: false, runs: 0,
+    params: [{ name: "operator", type: "text", required: false, desc: "Operator id, empty for all" }], warn: [], cols: ["operator", "total"] },
+  { id: "qb.admin.fee-invoices", desc: "The platform fee invoices, newest first, with the sponsor — for finance", tags: "finance", fav: false, runs: 1,
+    params: [{ name: "limit", type: "numeric", required: false, desc: "Max rows" }], warn: [], cols: ["invoiceNo", "sponsor", "amount"] },
+  { id: "qb.sponsor.analytics.trend", desc: "The sponsor's figures by hour or by day: views, starts, completions, passes, winners and Kudos spent", tags: "sponsor", fav: true, runs: 12,
+    params: [
+      { name: "from", type: "temporal", required: true, desc: "First bucket" },
+      { name: "to", type: "temporal", required: true, desc: "Last bucket ends before this" },
+      { name: "bucket", type: "enum", values: ["HOUR", "DAY"], required: true, desc: "" },
+    ], warn: [], cols: ["bucketStart", "views", "starts", "completions", "spent"] },
+];
+
+const state = { selected: "qb.admin.fee-credit-grants", filter: "", history: { }, values: {}, result: null, error: null };
+const $ = (s) => document.querySelector(s);
+
+function matches(q, f) {
+  if (!f) return true;
+  const t = f.toLowerCase();
+  return [q.id, q.desc, q.tags].some((x) => x.toLowerCase().includes(t));
+}
+
+function renderList() {
+  const hits = QUERIES.filter((q) => matches(q, state.filter)).sort((a, b) => b.fav - a.fav || a.id.localeCompare(b.id));
+  $("#count").textContent = `${hits.length} / ${QUERIES.length}`;
+  $("#list").innerHTML = hits.map((q) => `
+    <li class="item ${q.id === state.selected ? "active" : ""}" data-id="${q.id}">
+      <div class="item-top"><span class="item-id">${q.id}</span>
+        <button class="star ${q.fav ? "on" : ""}" data-star="${q.id}" title="${q.fav ? "Unfavorite" : "Favorite"}">${q.fav ? "★" : "☆"}</button></div>
+      <div class="item-desc">${q.desc}</div>
+      ${q.tags || q.runs ? `<div class="item-meta">${q.tags ? "#" + q.tags.split(",").map((t) => t.trim()).join(" #") : ""}${q.runs ? ` · ran ${q.runs}×` : ""}</div>` : ""}
+    </li>`).join("") || `<div class="empty">No matches</div>`;
+}
+
+function renderDetail() {
+  const q = QUERIES.find((x) => x.id === state.selected);
+  if (!q) { $("#detail").innerHTML = `<div class="empty">Pick a query on the left.</div>`; return; }
+  const hist = state.history[q.id] || [];
+  $("#detail").innerHTML = `
+    <header style="margin-bottom:12px">
+      <h2 class="page-title">${q.id}</h2>
+      <p class="page-sub">${q.desc}</p>
+      <div class="row" style="margin-top:8px">
+        <label class="field" style="flex:1">tags<input id="tags" value="${q.tags}" placeholder="e.g. weekly, ops" /></label>
+        <button class="ghost small" style="padding:6px 10px;font-size:14px" id="fav">${q.fav ? "★ favorite" : "☆ favorite"}</button>
+      </div>
+    </header>
+
+    ${q.warn.map((w) => `<div class="banner warn">⚠ ${w}</div>`).join("")}
+
+    <section class="card">
+      <h3 class="card-title">Parameters</h3>
+      <form class="form" id="form">
+        ${q.params.map((p) => `
+          <label class="field">${p.name}${p.required ? " <b>*</b>" : ""}
+            ${p.type === "enum"
+              ? `<select data-p="${p.name}"><option value="">— null —</option>${p.values.map((v) => `<option ${state.values[p.name] === v ? "selected" : ""}>${v}</option>`).join("")}</select>`
+              : `<input data-p="${p.name}" type="${p.type === "temporal" ? "datetime-local" : p.type === "numeric" ? "number" : "text"}" value="${state.values[p.name] ?? ""}" placeholder="${p.desc}" />`}
+            <small class="hint">${p.desc}</small>
+          </label>`).join("")}
+        <button class="run" type="submit" id="run">Run (read-only)</button>
+      </form>
+    </section>
+
+    ${state.error ? `<div class="banner error">${state.error}</div>` : ""}
+
+    ${state.result ? `
+      <section class="card">
+        <h3 class="card-title">Results</h3>
+        <div class="meta">${state.result.rows.length} rows · ${state.result.ms} ms</div>
+        <div class="table-wrap"><table>
+          <thead><tr>${state.result.cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead>
+          <tbody>${state.result.rows.map((r) => `<tr>${r.map((c) => `<td>${c ?? '<i class="null">NULL</i>'}</td>`).join("")}</tr>`).join("")}</tbody>
+        </table></div>
+      </section>` : ""}
+
+    <section class="card history">
+      <h3 class="card-title">🕘 Recent runs (${hist.length})</h3>
+      ${hist.length ? `<ul>${hist.map((h, i) => `
+        <li><button class="small ghost" data-reuse="${i}">Reuse values</button>
+          <span class="meta">${h.at} · ${h.ok ? `${h.rows} rows · ${h.ms} ms` : `<span style="color:var(--danger)">failed</span>`}</span></li>`).join("")}</ul>`
+        : `<div class="meta">No runs yet.</div>`}
+    </section>
+
+    <details class="card">
+      <summary style="cursor:pointer;font-weight:600">📄 SQL body</summary>
+      <pre>SELECT ... FROM {{QbFeeCreditGrant}} g
+WHERE g.granted_at >= :from
+  AND g.bucket = :bucket</pre>
+    </details>`;
+
+  document.querySelectorAll("[data-p]").forEach((el) => el.addEventListener("input", (e) => { state.values[e.target.dataset.p] = e.target.value; }));
+  $("#tags").addEventListener("change", (e) => { q.tags = e.target.value.trim(); renderList(); });
+  $("#fav").addEventListener("click", () => { toggleFav(q.id); });
+  $("#form").addEventListener("submit", (e) => { e.preventDefault(); run(q); });
+  document.querySelectorAll("[data-reuse]").forEach((b) => b.addEventListener("click", () => {
+    const h = (state.history[q.id] || [])[+b.dataset.reuse];
+    state.values = { ...h.params }; renderDetail();
+  }));
+}
+
+function toggleFav(id) {
+  const q = QUERIES.find((x) => x.id === id); q.fav = !q.fav;
+  renderList(); renderDetail();
+}
+
+function run(q) {
+  const missing = q.params.filter((p) => p.required && !state.values[p.name]);
+  const at = new Date().toLocaleTimeString();
+  if (missing.length) {
+    state.error = `Required: ${missing.map((m) => m.name).join(", ")}`;
+    state.result = null; renderDetail(); return;
+  }
+  const rows = Array.from({ length: 6 }, (_, i) => q.cols.map((c, j) => (j === 0 ? `2026-01-01 ${String(i).padStart(2, "0")}:00` : c === "spent" ? String(i * 100) : String(i * 3 + j))));
+  state.error = null;
+  state.result = { cols: q.cols, rows, ms: 14 };
+  q.runs += 1;
+  (state.history[q.id] = state.history[q.id] || []).unshift({ at, ok: true, rows: rows.length, ms: 14, params: { ...state.values } });
+  renderList(); renderDetail();
+}
+
+$("#search").addEventListener("input", (e) => { state.filter = e.target.value; renderList(); });
+$("#list").addEventListener("click", (e) => {
+  const star = e.target.closest("[data-star]");
+  if (star) { toggleFav(star.dataset.star); return; }
+  const li = e.target.closest(".item");
+  if (li) { state.selected = li.dataset.id; state.result = null; state.error = null; state.values = {}; renderList(); renderDetail(); }
+});
+$("#reindex").addEventListener("click", () => renderList());
+
+renderList(); renderDetail();
+</script>
+</body>
+</html>
